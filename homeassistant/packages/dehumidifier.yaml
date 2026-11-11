@@ -2,7 +2,7 @@
 # Load it with:   homeassistant: { packages: !include_dir_named packages }
 
 template:
-  # On/off for Apple Home. HomeKit has no honest tile for a Home Assistant climate entity (it would show up as a
+  # On/off for Apple Home. HomeKit has no proper tile for a Home Assistant climate entity (it would show up as a
   # thermostat), so Apple Home gets a plain switch plus the humidity reading; mode, fan and target humidity stay in
   # Home Assistant. The switch reads its state from the unit, so the panel buttons and the app never disagree.
   - switch:

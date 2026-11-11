@@ -160,7 +160,7 @@ target during on-peak hours and puts it back.
 [`homeassistant/homekit.yaml`](homeassistant/homekit.yaml) is the HomeKit Bridge entry.
 
 Why a switch and not a dehumidifier tile: HomeKit shows a Home Assistant climate entity as a thermostat, which would
-be wrong, so Apple Home gets an honest on/off switch and a humidity sensor. The switch reads its state from the
+be wrong, so Apple Home gets a plain on/off switch and a humidity sensor. The switch reads its state from the
 unit, so pressing the power button on the panel flips the tile in Apple Home too. Mode, fan and target stay in Home
 Assistant.
 
