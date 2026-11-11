@@ -48,7 +48,7 @@ still working when the internet is down.
 
 Software: [ESPHome](https://esphome.io/), [Home Assistant](https://www.home-assistant.io/) with its
 [HomeKit Bridge](https://www.home-assistant.io/integrations/homekit/), and the `midea_dehum` component from
-[Chreece/ESPHome-Dehumidifier](https://github.com/Chreece/ESPHome-Dehumidifier).
+[Chreece/ESPHome-Dehumidifier](https://github.com/Chreece/ESPHome-Dehumidifier) (Apache-2.0).
 
 <p align="center">
   <img src="docs/images/parts.jpg" width="420" alt="The parts laid out: multimeter, level converters, ESP32, jumper wires, heat-shrink">
@@ -186,12 +186,16 @@ Asking Siri, with the unit's display following:
 
 ## Credits
 
-- [Chreece/ESPHome-Dehumidifier](https://github.com/Chreece/ESPHome-Dehumidifier), the ESPHome component this
-  runs on.
-- [Hypfer/esp8266-midea-dehumidifier](https://github.com/Hypfer/esp8266-midea-dehumidifier), the protocol work it
-  is ported from.
+- [Chreece (Christos Baltatzidis)](https://github.com/Chreece), who wrote and maintains
+  [ESPHome-Dehumidifier](https://github.com/Chreece/ESPHome-Dehumidifier), the ESPHome component this runs on.
+- [Zane Pickett (sirwolfgang)](https://github.com/sirwolfgang), who added the component's V2 protocol support
+  ([#44](https://github.com/Chreece/ESPHome-Dehumidifier/pull/44)). This unit speaks V2, so that's the code it runs.
+- [Hypfer](https://github.com/Hypfer), whose [esp8266-midea-dehumidifier](https://github.com/Hypfer/esp8266-midea-dehumidifier)
+  worked out the protocol the component was ported from.
+- [CDank](https://github.com/CDank), [Joseph Jon Booker](https://github.com/sargas) and the component's other
+  contributors.
 
-Thank you both.
+Thank you all.
 
 ## License
 
