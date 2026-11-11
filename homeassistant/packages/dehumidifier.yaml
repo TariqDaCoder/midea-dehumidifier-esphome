@@ -1,0 +1,44 @@
+# Home Assistant package for the dehumidifier (ESPHome device "basement-dehumidifier").
+# Load it with:   homeassistant: { packages: !include_dir_named packages }
+
+template:
+  # On/off for Apple Home. HomeKit has no honest tile for a Home Assistant climate entity (it would show up as a
+  # thermostat), so Apple Home gets a plain switch plus the humidity reading; mode, fan and target humidity stay in
+  # Home Assistant. The switch reads its state from the unit, so the panel buttons and the app never disagree.
+  - switch:
+      - name: Basement Dehumidifier
+        unique_id: basement_dehumidifier_power
+        state: "{{ not is_state('climate.basement_dehumidifier', 'off') }}"
+        availability: "{{ states('climate.basement_dehumidifier') not in ['unavailable', 'unknown'] }}"
+        turn_on:
+          - action: climate.turn_on
+            target: {entity_id: climate.basement_dehumidifier}
+        turn_off:
+          - action: climate.turn_off
+            target: {entity_id: climate.basement_dehumidifier}
+
+automation:
+  # A notification when the basement stays more than 5 points above the dehumidifier's target for 2 hours (above 55%
+  # at a target of 50%), or when the bucket fills. The limit follows the target, so raising the target on purpose
+  # (see dehumidifier_onpeak.yaml) doesn't set it off.
+  - id: basement_dehumidifier_alerts
+    alias: "Basement dehumidifier: humidity high or bucket full"
+    mode: single
+    triggers:
+      - trigger: template
+        value_template: >
+          {{ states('sensor.basement_dehumidifier_humidity') | float(0)
+             > states('number.basement_dehumidifier_target_humidity') | float(50) + 5 }}
+        for: "02:00:00"
+        id: humid
+      - trigger: state
+        entity_id: binary_sensor.basement_dehumidifier_bucket_full
+        to: "on"
+        id: bucket
+    actions:
+      - action: notify.notify   # use your own, e.g. notify.mobile_app_<your_phone>
+        data:
+          title: "{{ 'Dehumidifier bucket full' if trigger.id == 'bucket' else 'Basement still humid' }}"
+          message: >
+            {{ 'Empty the basement dehumidifier bucket; it stopped until then.' if trigger.id == 'bucket'
+               else 'The basement has been well above the dehumidifier\'s setting for 2 hours (' ~ states('sensor.basement_dehumidifier_humidity') ~ '%). Check the dehumidifier is running.' }}

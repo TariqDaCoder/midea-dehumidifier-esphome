@@ -1,0 +1,115 @@
+# Midea MAD50PS1BWT-C dehumidifier with its Wi-Fi dongle replaced by an ESP32 on the dongle port's UART.
+# Component: github.com/Chreece/ESPHome-Dehumidifier (midea_dehum, a port of Hypfer's esp8266-midea-dehumidifier),
+# pinned to a commit. Wiring and flashing: the README at the top of this repo.
+esphome:
+  name: basement-dehumidifier
+  friendly_name: Basement Dehumidifier
+  min_version: 2025.11.0   # the component's minimum
+
+esp32:
+  board: esp32dev          # Inland ESP32-WROOM-32 dev board
+  framework:
+    type: esp-idf
+
+logger:
+  baud_rate: 0             # the hardware UART belongs to the dehumidifier, not the log
+
+api:
+  encryption:
+    key: !secret dehumidifier_api_key
+
+ota:
+  - platform: esphome
+    password: !secret dehumidifier_ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:                      # no Wi-Fi: it opens "Basement-Dehumidifier" so it can be set from a phone
+    ssid: Basement-Dehumidifier
+    password: !secret dehumidifier_ap_password
+
+captive_portal:
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/Chreece/ESPHome-Dehumidifier
+      ref: 0e46ee10096ee58213e4e37cc058a3912af9cd99
+    components: [midea_dehum]
+
+uart:
+  id: uart_midea
+  tx_pin: GPIO16           # to the unit's RX (the plug's D+ screw), through the level converter
+  rx_pin: GPIO17           # from the unit's TX (the plug's D- screw), through the level converter
+  baud_rate: 9600
+
+midea_dehum:
+  id: midea_dehum_comp
+  uart_id: uart_midea
+  protocol_version: 2      # what auto-detect found on this model; pinned, so boot doesn't wait on detection
+  display_mode_setpoint: Set
+  display_mode_continuous: Continuous
+  display_mode_smart: Smart
+  display_mode_clothes_drying: Dry
+
+# What this unit reports under "Device Capabilities": fan speed, filter reminder, drain pump, ionizer, auto humidity
+# control, clothes drying. It has no swing, PM2.5 or tank level (they read a constant 0), so they aren't configured.
+climate:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    name: None              # named after the device: climate.basement_dehumidifier (power, mode, fan, humidity)
+
+binary_sensor:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    bucket_full:
+      name: Bucket Full
+    clean_filter:
+      name: Clean Filter
+    defrost:
+      name: Defrosting
+
+button:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    filter_cleaned:
+      name: Filter Cleaned
+
+sensor:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    error:
+      name: Error Code
+    humidity:
+      name: Humidity
+    temperature:
+      name: Temperature
+
+switch:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    ionizer:
+      name: Ionizer
+    pump:
+      name: Pump
+    sleep:
+      name: Sleep Mode
+    beep:
+      name: Beep on Command
+
+number:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    timer:
+      name: Timer
+    target_humidity:
+      name: Target Humidity
+
+text_sensor:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    capabilities:
+      name: Device Capabilities
+    protocol:
+      name: Protocol Version

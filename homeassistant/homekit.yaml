@@ -1,0 +1,13 @@
+# The part of configuration.yaml that puts the dehumidifier in Apple Home, through Home Assistant's HomeKit Bridge.
+# Only the on/off switch and the humidity reading go across (see packages/dehumidifier.yaml for why).
+homekit:
+  - name: Home Assistant Bridge
+    filter:
+      include_entities:
+        - switch.basement_dehumidifier
+        - sensor.basement_dehumidifier_humidity
+    entity_config:
+      switch.basement_dehumidifier:
+        name: Dehumidifier
+      sensor.basement_dehumidifier_humidity:
+        name: Basement Humidity
