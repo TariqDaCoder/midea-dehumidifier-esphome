@@ -26,9 +26,9 @@ still working when the internet is down.
 - On and off from Apple Home, Siri, Home Assistant or the unit's own buttons, and all of them stay in step.
 - Target humidity, mode (Set, Continuous, Smart, Dry) and fan speed from Home Assistant.
 - Live humidity and temperature, with history.
-- A phone notification when the bucket is full, and another when the basement stays more than 5 points above the
-  target for 2 hours.
-- The target goes up 5 points during my utility's on-peak hours (weekdays 6 to 9 pm) and back afterwards.
+- It runs in long, cheap runs instead of short-cycling (below): overnight at my utility's off-peak price, only when
+  the house holds moisture, and off as soon as the basement reaches 50%. It never runs in on-peak hours.
+- A phone notification when the bucket is full, and another when the basement stays over 62% for 3 hours.
 - Firmware updates over Wi-Fi.
 
 ![Use cases: anyone in the house turns it on or off and sees the humidity; I set target, mode and fan and update the firmware; Home Assistant sends the alerts and eases the unit off at on-peak rates.](docs/images/use-cases.png)
@@ -57,8 +57,9 @@ Software: [ESPHome](https://esphome.io/), [Home Assistant](https://www.home-assi
 
 ## Measure before you wire
 
-The dongle port looks like USB, but it isn't. It carries **5 V serial data at 9600 baud**. The guide I followed
-numbers the power pins the opposite way to my unit, so wiring by pin number would have fed the board backwards.
+The dongle port looks like USB, but it isn't. It carries **5 V serial data at 9600 baud**. The pin table I followed
+at the time numbered the power pins the opposite way to the USB-A standard, so wiring by pin number would have fed
+the board backwards. (The project's hardware guide has since been rewritten without pin numbers.) Measure first.
 
 With the screw-terminal plug in the port and nothing else connected, I metered **+5.04 V on the plug's V+ screw**
 against the − screw. So on this model the power is on the standard USB pins. Go by the labels on the plug, and check
@@ -154,9 +155,9 @@ the sealed system.
 ## Home Assistant and Apple Home
 
 [`homeassistant/packages/dehumidifier.yaml`](homeassistant/packages/dehumidifier.yaml) has the on/off switch that
-Apple Home gets, and the two alerts.
-[`homeassistant/packages/dehumidifier_onpeak.yaml`](homeassistant/packages/dehumidifier_onpeak.yaml) raises the
-target during on-peak hours and puts it back.
+Apple Home gets, the status sensor, the run schedule and the two alerts.
+[`homeassistant/packages/electricity_period.yaml`](homeassistant/packages/electricity_period.yaml) is the price
+period it schedules by (my utility's time-of-use hours; change them to yours).
 [`homeassistant/homekit.yaml`](homeassistant/homekit.yaml) is the HomeKit Bridge entry.
 
 Why a switch and not a dehumidifier tile: HomeKit shows a Home Assistant climate entity as a thermostat, which would
@@ -164,9 +165,24 @@ be wrong, so Apple Home gets a plain on/off switch and a humidity sensor. The sw
 unit, so pressing the power button on the panel flips the tile in Apple Home too. Mode, fan and target stay in Home
 Assistant.
 
-The on-peak automation is careful about three things: it never raises a target that is already at 56% or higher, it
-leaves alone a target someone changed by hand in the meantime, and it puts the target back after a Home Assistant
-restart if on-peak ended while it was down.
+### It was short-cycling
+
+Left on its own "Set 50%" mode, the unit started its compressor about 100 times a day: roughly 7 minutes on, 6.5
+off, plain to see as ~390 W steps on my whole-house power meter. Its humidity reading sawed between 50 and 61% while
+the rest of the house held 47-49%. The cause is where the sensor sits: in the unit's own airflow. With the
+compressor off, the fan blows over the wet coil, some of the water just removed evaporates again, the reading climbs
+and the compressor restarts.
+
+So Home Assistant runs it in **Continuous** mode (compressor on the whole time) in one long run instead:
+
+- at off-peak (midnight to 6 am), on nights the house air holds moisture (living room dew point 50°F or more), and
+  every third night as a check otherwise;
+- in the day only if the house stays damp for an hour, and never in on-peak hours;
+- any run stops once the basement reads 50% (from 30 minutes in), and the firmware only publishes the humidity after
+  20 minutes of running, because the reading of a stopped unit is the wet coil talking.
+
+The first night: **one compressor start** instead of 17 in the same hours the night before, and about **0.23 kWh**
+at the off-peak price against roughly **4.7 kWh a day** before.
 
 ![Sequence diagram: "turn off the dehumidifier" goes from Apple Home to Home Assistant over HomeKit, to the ESP32 over the encrypted API, to the unit over serial, and the state comes back the same way](docs/images/sequence.png)
 
@@ -186,14 +202,14 @@ Asking Siri, with the unit's display following:
 
 ## Credits
 
-- [Chreece (Christos Baltatzidis)](https://github.com/Chreece), who wrote and maintains
+- [Chreece](https://github.com/Chreece), who wrote and maintains
   [ESPHome-Dehumidifier](https://github.com/Chreece/ESPHome-Dehumidifier), the ESPHome component this runs on.
 - [Zane Pickett (sirwolfgang)](https://github.com/sirwolfgang), who added the component's V2 protocol support
   ([#44](https://github.com/Chreece/ESPHome-Dehumidifier/pull/44)). This unit speaks V2, so that's the code it runs.
 - [Hypfer](https://github.com/Hypfer), whose [esp8266-midea-dehumidifier](https://github.com/Hypfer/esp8266-midea-dehumidifier)
   worked out the protocol the component was ported from.
-- [CDank](https://github.com/CDank), [Joseph Jon Booker](https://github.com/sargas) and the component's other
-  contributors.
+- [CDank](https://github.com/CDank), [sargas](https://github.com/sargas), [nbogojevic](https://github.com/nbogojevic)
+  and the component's other contributors.
 
 Thank you all.
 
