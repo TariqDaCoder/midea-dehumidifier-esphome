@@ -38,11 +38,11 @@ still working when the internet is down.
 | Part | What I used | Link |
 |---|---|---|
 | Dehumidifier | Midea MAD50PS1BWT-C, 50 pint, built-in pump | [Costco](https://www.costco.com/p/-/midea-smart-50-pint-dehumidifier-with-built-in-pump/4000437929) |
-| ESP32 dev board | Inland ESP32-WROOM-32, USB-C (`esp32dev`) | [Micro Center (search)](https://www.microcenter.com/search/search_results.aspx?Ntt=inland+esp32) |
-| Logic level converter | 4-channel, BSS138, 5 V to 3.3 V | generic; the same part at [Adafruit](https://www.adafruit.com/product/757) and [SparkFun](https://www.sparkfun.com/products/12009) |
-| USB-A male plug with screw terminals | generic, 4 terminals | a similar one at [Adafruit](https://www.adafruit.com/product/3628) |
-| Jumper wires | ELEGOO dupont kit (9 wires used) | [ELEGOO](https://us.elegoo.com/products/elegoo-multicolored-dupont-wire-kit) |
-| Heat-shrink tubing | Electro Bits assorted, black | [Micro Center (search)](https://www.microcenter.com/search/search_results.aspx?Ntt=electro+bits+heat+shrink) |
+| ESP32 dev board | Inland ESP32-WROOM-32, USB-C (`esp32dev`) | [Micro Center](https://www.microcenter.com/product/704601/ESP32-WROOM_Core_Board_with_USB-C_WiFi_Bluetooth_Dual_Core_Microcontroller_for_Arduino) |
+| Logic level converter | 4-channel, BSS138, 5 V to 3.3 V | [Amazon](https://www.amazon.com/dp/B0F7QPNR4K) |
+| USB-A male plug with screw terminals | JUXINICE solderless, 4 terminals | [Amazon](https://www.amazon.com/dp/B09WYRNDDQ) |
+| Jumper wires | ELEGOO 120-piece dupont kit (9 wires used) | [Amazon](https://www.amazon.com/dp/B01EV70C78) |
+| Heat-shrink tubing | assorted sizes, black | [Micro Center](https://www.microcenter.com/product/689124/Assorted_Size_Black_Color_4_Heat_Shrink_Tubing_-_24_Pack) |
 | Multimeter | Hyper Tough digital multimeter | [Walmart (search)](https://www.walmart.com/search?q=hyper+tough+digital+multimeter) |
 | Short USB-A extension cable | generic | any |
 
